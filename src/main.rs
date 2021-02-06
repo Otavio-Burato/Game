@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowMode};
 
 struct Player;
 struct Materials {
@@ -7,6 +7,14 @@ struct Materials {
 
 fn main() {
     App::build()
+        .add_resource(WindowDescriptor {
+            title: "Game by Burato".to_string(),
+            cursor_visible: false,
+            vsync: true,
+            resizable: false,
+            mode: WindowMode::Fullscreen { use_size: true },
+            ..Default::default()
+        })
         .add_startup_system(setup.system())
         .add_startup_stage("game_setup", SystemStage::single(spawn_player.system()))
         .add_system(player_movement.system())
@@ -15,11 +23,19 @@ fn main() {
         .run();
 }
 
-fn setup(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-    commands.spawn(Camera2dBundle::default());
-    commands.insert_resource(Materials {
-        player_material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-    });
+fn setup(
+    commands: &mut Commands,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+) {
+    commands
+        .spawn(Camera2dBundle::default())
+        .insert_resource(Materials {
+            player_material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+        });
+    let music = asset_server.load("Puppeteer.mp3");
+    audio.play(music);
 }
 
 fn spawn_player(commands: &mut Commands, materials: Res<Materials>) {
@@ -37,17 +53,17 @@ fn player_movement(
     mut player_positions: Query<&mut Transform, With<Player>>,
 ) {
     for mut transform in player_positions.iter_mut() {
-        if keyboard_input.pressed(KeyCode::Left) {
+        if keyboard_input.pressed(KeyCode::W) {
+            transform.translation.y += 2.;
+        }
+        if keyboard_input.pressed(KeyCode::A) {
             transform.translation.x -= 2.;
         }
-        if keyboard_input.pressed(KeyCode::Right) {
-            transform.translation.x += 2.;
-        }
-        if keyboard_input.pressed(KeyCode::Down) {
+        if keyboard_input.pressed(KeyCode::S) {
             transform.translation.y -= 2.;
         }
-        if keyboard_input.pressed(KeyCode::Up) {
-            transform.translation.y += 2.;
+        if keyboard_input.pressed(KeyCode::D) {
+            transform.translation.x += 2.;
         }
     }
 }
