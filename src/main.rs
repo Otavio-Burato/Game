@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::WindowMode};
+use bevy::prelude::*;
 
 struct Player;
 struct Materials {
@@ -12,7 +12,7 @@ fn main() {
             cursor_visible: false,
             vsync: true,
             resizable: false,
-            mode: WindowMode::Fullscreen { use_size: true },
+            //mode: WindowMode::Fullscreen { use_size: false },
             ..Default::default()
         })
         .add_startup_system(setup.system())
